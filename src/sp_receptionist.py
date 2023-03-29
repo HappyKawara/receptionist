@@ -7,6 +7,11 @@ from happymimi_voice_msgs.srv import SpeechToText
 import sys
 import rospy
 import random
+from nltk.tag.stanford import StanfordPOSTagger
+file_path=path.expanduser('~/catkin_ws/src/happymimi_voice/config/dataset')
+pos_tag = StanfordPOSTagger(model_filename = file_path + "/stanford-postagger/models/english-bidirectional-distsim.tagger",
+                            path_to_jar = file_path + "/stanford-postagger/stanford-postagger.jar")
+
 '''
 self.feature_dic = {"guest1":{"name":"","drink":"","age":""},
                 "guest2":{"name":"","drink":"","age":""}}
@@ -34,7 +39,13 @@ class GetFeature():
         n = 0
         while n < 2:
             self.tts("What is your name?")
-            ans = self.stt().result_str#名前だけ取り出すようにする
+            ans = self.stt().result_str
+            #名前だけ取り出すようにする
+            pos = pos_tag.tag(string.split())
+            for p in pos:
+                if p[1] == 'NNP':
+                    name = p[0]
+
             self.tts("Are you" + ans + "? please answer yes or no.")
             yes_no = self.stt(short_str=True,context_phrases=["yes","no"],boost_value=20.0)
             if "yes" in yes_no:
@@ -49,7 +60,11 @@ class GetFeature():
         n = 0
         while n < 2:
             self.tts("What is your favorite drink?")
-            ans = self.stt().result_str#飲み物だけ取り出すようにする
+            ans = self.stt().result_str
+            #飲み物だけ取り出すようにする
+            pos = pos_tag.tag(string.split())
+
+
             self.tts("your favorite drink is" + ans + ". Is this ok? please answer yes or no.")
             yes_no = self.stt(short_str=True,context_phrases=["yes","no"],boost_value=20.0)
             if "yes" in yes_no:
