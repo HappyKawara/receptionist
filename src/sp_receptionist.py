@@ -8,15 +8,15 @@ import sys
 import rospy
 import random
 from nltk.tag.stanford import StanfordPOSTagger
-file_path=path.expanduser('~/catkin_ws/src/happymimi_voice/config/dataset')
-pos_tag = StanfordPOSTagger(model_filename = file_path + "/stanford-postagger/models/english-bidirectional-distsim.tagger",
-                            path_to_jar = file_path + "/stanford-postagger/stanford-postagger.jar")
+nltk_path=path.expanduser('~/catkin_ws/src/happymimi_voice/config/dataset')
+pos_tag = StanfordPOSTagger(model_filename = nltk_path + "/stanford-postagger/models/english-bidirectional-distsim.tagger",
+                            path_to_jar = nltk_path + "/stanford-postagger/stanford-postagger.jar")
 
 '''
 self.feature_dic = {"guest1":{"name":"","drink":"","age":""},
                 "guest2":{"name":"","drink":"","age":""}}
 '''
-file_path = ""
+file_path=os.path.expanduser('~/catkin_ws/src/receptionist/config/guest_feature.pkl')
 class GetFeature():
     def __init__(self):
         print('Wahing for tts and stt_server')
