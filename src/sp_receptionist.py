@@ -63,12 +63,15 @@ class GetFeature():
             ans = self.stt().result_str
             #飲み物だけ取り出すようにする
             pos = pos_tag.tag(string.split())
-
-
-            self.tts("your favorite drink is" + ans + ". Is this ok? please answer yes or no.")
+            drink = ""
+            for p in pos:
+                if p[1] == 'NN':
+                    if p[0] != 'drink':
+                        drink = drink + p[0]
+            self.tts("your favorite drink is" + drink + ". Is this ok? please answer yes or no.")
             yes_no = self.stt(short_str=True,context_phrases=["yes","no"],boost_value=20.0)
             if "yes" in yes_no:
-                savePickle("drink",ans)
+                savePickle("drink",drink)
                 n = 2
             else:
                 if n == 1:

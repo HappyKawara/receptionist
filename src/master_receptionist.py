@@ -10,7 +10,6 @@ import smach_ros
 from std_msgs.msg import Float64
 from happymimi_msgs.srv import SimpleTrg, StrTrg
 from happymimi_navigation.srv import NaviLocation, NaviCoord
-
 #音声
 import sp_receptionist as sp
 
@@ -38,7 +37,6 @@ class MoveInitalPosition(smach.State):#ゲストの検出のための位置へ�
         '''
         if guest_num == 0:
            dooropen
-
         '''
         self.navi_srv('inital position')
         self.bc.rotateAngle(,0.2)#入り口の方を向く
@@ -74,6 +72,7 @@ class IntroduceGuests(smach.State):#オーナーのもとへ移動、ゲスト�
                              input_keys = ['g_count_in']
                              )
         self.navi_srv = rospy.ServiceProxy('navi_location_Server', NaviLocation)
+        self.arm_srv = rospy.ServiceProxy('/servo/arm', StrTrg)
         self.bc = BaseControl()
 
     def execute(self,userdata):
@@ -83,7 +82,7 @@ class IntroduceGuests(smach.State):#オーナーのもとへ移動、ゲスト�
         '''
         ゲストの方を指す
         self.bc.rotateAngle(,0.2)
-
+        self.arm_srv('origin')
         '''
         introduce = sp.IntroduceOfGuests()
         introduce.main(guest_num)
@@ -96,6 +95,8 @@ class GuideGuests(smach.State):#ゲストのガイド
                              output_keys =  ['g_count_out'])
         with open(file_path,mode="rb") as f:
             self.feature_dic = pickle.load(f)
+        self.bc = BaseControl()
+        self.arm_srv = rospy.ServiceProxy('/servo/arm', StrTrg)
 
     def execute(self, userdata):
         rospy.loginfo("Executing state:GUIDE_GUESTS")
@@ -103,6 +104,8 @@ class GuideGuests(smach.State):#ゲストのガイド
         if guest_num == 0:
             '''
             空いている椅子を指す
+            self.bc.rotateAngle(,0.2)
+            self.arm_srv('origin')
             '''
             wave_srv("")#("Please sit in this chair.")
             guest_num += 1
