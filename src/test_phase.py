@@ -12,6 +12,7 @@ from os import path
 import sys
 #from happymimi_voice_msgs.srv import GgiLearning
 #from happymimi_voice_msgs.srv import GgiLearningResponse
+import nltk
 from nltk.tag.stanford import StanfordPOSTagger
 import rospy
 import random
@@ -25,9 +26,42 @@ print("data loading...")
 pos_tag = StanfordPOSTagger(model_filename = file_path + "/stanford-postagger/models/english-bidirectional-distsim.tagger",
                             path_to_jar = file_path + "/stanford-postagger/stanford-postagger.jar")
 
-string = "My favorite drink is coffe."
+string = "My favorite drink is coffee."
 pos = pos_tag.tag(string.split())
+a = ""
 print(pos)
+for p in pos:
+    print(p)
+    if p[1] == 'NN':
+        print(p[1])
+        if p[0] != 'drink':
+            print(p[0])
+            a = p[0]
+            print(a)
+print(a)
+
+'''
+s = "Hi, I'm Taro Yamada I woke up at 8am"
+morph = nltk.word_tokenize(s)
+pos = nltk.pos_tag(morph)
+# chunk.ne_chunkに品詞情報を渡す
+entities = nltk.chunk.ne_chunk(pos)
+print(entities)
+'''
+
+
+#(S
+# (GPE Hi/NNP)
+#  ,/,
+#  I/PRP
+#  'm/VBP
+#  (PERSON Taro/JJ Yamada/NNP)
+#  ./.
+#  I/PRP
+#  woke/VBD
+#  up/RB
+#  at/IN
+#  8am/CD)
 
 '''
 class GgiTest():
