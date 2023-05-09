@@ -34,13 +34,12 @@ class MoveInitalPosition(smach.State):#ゲストの検出のための位置へ�
     def execute(self,userdata):
         rospy.loginfo("Executing state:MOVE_INITAL_POSITION")
         guest_num = userdata.g_count_in
-        '''
-        if guest_num == 0:
-           dooropen
-        '''
-        self.navi_srv('inital position')
-        self.bc.rotateAngle(,0.2)#入り口の方を向く
-        rospy.sleep(0.5)
+        if guest_num == 1:
+            self.navi_srv('inital position')
+            self.bc.rotateAngle(,0.2)#入り口の方を向く
+            rospy.sleep(0.5)
+        elif guest_num == 0:
+            tts_srv("start receptionist")
         return 'move_finish'
 
 class DiscoverGuests(smach.State):#ゲストの検出、受付
