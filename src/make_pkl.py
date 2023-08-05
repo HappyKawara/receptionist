@@ -4,7 +4,7 @@
 import os
 import pickle
 
-file_path=os.path.expanduser('~/catkin_ws/src/receptionist/config')
+file_path=os.path.expanduser('~/main_ws/src/receptionist/config')
 with open(file_path + '/guest_feature.pkl', "wb") as f:
     feature_dic = {"guest1":{"name":"","drink":"","age":""},
                 "guest2":{"name":"","drink":"","age":""}}
