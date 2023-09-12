@@ -18,16 +18,19 @@ pos_tag = StanfordPOSTagger(model_filename = nltk_path + "/stanford-postagger/mo
 self.feature_dic = {"guest1":{"name":"","drink":"","age":""},
                 "guest2":{"name":"","drink":"","age":""}}
 '''
+
 file_path=os.path.expanduser('~/main_ws/src/receptionist/config/guest_feature.pkl')
 class GetFeature():
     def __init__(self):
         print('Waiting for tts and stt_server')
+        '''
         rospy.wait_for_service('/tts')
-        rospy.wait_for_service('/stt_server2')
-        self.stt=rospy.ServiceProxy('/stt_server2',SpeechToText)
+        rospy.wait_for_service('/stt_server')
+        self.stt=rospy.ServiceProxy('/stt_server',SpeechToText)
         self.tts=rospy.ServiceProxy('/tts', StrTrg)
         with open(file_path,mode="rb") as f:
             self.feature_dic = pickle.load(f)
+        '''
 
     def savePickle(self,feature_type,feature):
         if self.feature_dic["guest1"][feature_type]:
@@ -43,11 +46,12 @@ class GetFeature():
         while n < 2:
             name = ''
             name2 = ''
-            self.tts("What is your name?")
-            ans = self.stt().result_str
-            #ans = "my name is mike."
+            #self.tts("What is your name?")
+            #ans = self.stt().result_str
+            ans = "i'm mike."
             #名前だけ取り出すようにする
             pos = pos_tag.tag(ans.split())
+            print(pos)
             for i,p in enumerate(pos):
                 if p[1] == 'NNP':
                     name = p[0]
@@ -59,10 +63,12 @@ class GetFeature():
                     name = pos[i+1][0]
             if not name:
                 name =name2
-            self.tts("Are you" + name + "? please answer yes or no.")
-            print(pos,ans,name)
+            #self.tts("Are you" + name + "? please answer yes or no.")
+            print(pos)
+            print(ans)
+            print(name)
             rospy.sleep(0.5)
-            yes_no = self.stt(short_str=True,context_phrases=["yes","no"],boost_value=20.0)
+            #yes_no = self.stt(short_str=True,context_phrases=["yes","no"],boost_value=20.0)
             print(yes_no.result_str)
             if ({"yes","yeah","yet",""} & set(yes_no.result_str.split())):
                 self.savePickle("name",name)
@@ -105,9 +111,7 @@ class GetFeature():
                     self.savePickle("drink","None")
                 n+=1
 
-    def getAge(self,age):
-        self.savePickle("age",age)
-        '''
+    def getAge(self):
         n = 0
         while n < 2:
             self.tts("How old are you?")
@@ -123,7 +127,6 @@ class GetFeature():
                 if n == 1:
                     self.savePickle("age","None")
                 n+=1
-        '''
 
 class IntroduceOfGuests():
     def __init__(self):
