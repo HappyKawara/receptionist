@@ -414,8 +414,8 @@ class GuideGuests(smach.State):#ゲストのガイド
                 if person_points:
                     i = 0
                     while(1):
-                        chair_x,chair_y = Calculate_Angle(chair_points,i)
-                        if (chair_x < RANGE)and(chair_y < RANGE):
+                        person_x,person_y = Calculate_Angle(person_points,i)
+                        if (person_x < RANGE)and(person_y < RANGE):
                             break
                         else:
                             i += 1
