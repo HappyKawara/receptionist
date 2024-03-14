@@ -221,7 +221,7 @@ class GuideGuests(smach.State):#ゲストのガイド
                 chair_points = self.multiple("chair").points
                 if chair_points:
                     print(chair_points)
-                    if len(chair_points) > 1:
+                    if len(chair_points) > 1:#なんだこれ？
                         chair_x,chair_y = self.guide.Calculate_Angle(chair_points,0)
                         chair_x2,chair_y2 = self.guide.Calculate_Angle(chair_points,1)
                         if chair_y2 > chair_y:
@@ -249,9 +249,12 @@ class GuideGuests(smach.State):#ゲストのガイド
                     return 'guide_finish'
         
         elif guest_num == 1:#年齢順に
+            #年齢が取得できていることの確認
             if(''.join(re.findall(r'\d+', self.feature_dic["guest1"]["age"]))) and (''.join(re.findall(r'\d+',self.feature_dic["guest2"]["age"]))):
+                #ゲスト１のほうが年齢が低いとき
                 if(int(''.join(re.findall(r'\d+', self.feature_dic["guest1"]["age"]))) < int(''.join(re.findall(r'\d+',self.feature_dic["guest2"]["age"])))):
                     chair_points = self.multiple("person").points
+                    #RANGE外の座標にある椅子を除外し、一番左にある椅子に向きを変える
                     if chair_points:
                         i = 0
                         while(1):
@@ -267,15 +270,18 @@ class GuideGuests(smach.State):#ゲストのガイド
                         rospy.sleep(1.0)
                         self.bc.rotateAngle(int(angle),0.2)
                         print('angle:'+str(angle))
-                    #空いている椅子を指す（ゲスト1に座らせる）
+                        
+                    #空いている椅子を指す（ゲスト１に座らせる）
                     rospy.sleep(2.5)
                     self.arm_srv('point')
                     rospy.sleep(2.5)
-                    tts_srv("Hi, " + self.feature_dic["guest2"]["name"] +",Please sit in this chair.")
+                    tts_srv("Hi, " + self.feature_dic["guest1"]["name"] +",Please sit in this chair.")
                     self.arm_srv('carry')
                     rospy.sleep(2.5)
                     #ゲスト1が座っていた椅子を指す
                     chair_points = self.multiple("chair").points
+                
+                    #RANGE外の座標にある椅子を除外し、一番左にある椅子に向きを変える
                     if chair_points:
                         i = 0
                         while (1):
@@ -286,6 +292,8 @@ class GuideGuests(smach.State):#ゲストのガイド
                                 i += 1
 
                         angle = math.atan2(chair_y,chair_x) * (180/ math.pi)
+                        
+                    #人の方向を求める
                     person_points = self.multiple("person").points
                     if person_points:
                         i = 0
@@ -297,8 +305,9 @@ class GuideGuests(smach.State):#ゲストのガイド
                                 i += 1
                         person_angle = math.atan2(person_y,person_x) * (180/ math.pi) 
                         print('person_angle:'+ str(person_angle) + 'angle:'+str(angle))
+                        
+                    #人と椅子の方向がかぶっているとき次の椅子を参照する
                     if (person_angle + 3 > angle) and (person_angle - 3 < angle):
-                    
                         while(1):
                             chair_x,chair_y = self.guide.Calculate_Angle(chair_points,i)
                             if (chair_x < RANGE)and(chair_y < RANGE):
@@ -323,6 +332,8 @@ class GuideGuests(smach.State):#ゲストのガイド
 
                 else:
                     #空いている椅子を指す
+                    
+                    #RANGE外の座標にある椅子を除外し、一番左にある椅子に向きを変える
                     chair_points = self.multiple("chair").points
                     if chair_points:
                         i = 0
@@ -332,8 +343,9 @@ class GuideGuests(smach.State):#ゲストのガイド
                                 break
                             else:
                                 i += 1
-
                         angle = math.atan2(chair_y,chair_x) * (180/ math.pi)
+
+                    #RANGE外の座標にある人を除外
                     person_points = self.multiple("person").points
                     if person_points:
                         i = 0
@@ -345,8 +357,9 @@ class GuideGuests(smach.State):#ゲストのガイド
                                 i += 1
                         person_angle = math.atan2(person_y,person_x) * (180/ math.pi)
                     print('person_angle:'+ str(person_angle) + 'angle:'+str(angle))
+
+                    #人と椅子の方向がかぶっているとき右の椅子を参照する
                     if (person_angle + 3 > angle) and (person_angle - 3 < angle):
-                    
                         while (1):
                             chair_x,chair_y = self.guide.Calculate_Angle(chair_points,i)
                             if (chair_x < RANGE)and(chair_y < RANGE):
@@ -359,6 +372,7 @@ class GuideGuests(smach.State):#ゲストのガイド
                     else:
                         rospy.sleep(3.0)
                         self.bc.rotateAngle(int(angle),0.2)
+                        
                     print("angle:" + str(angle))
 
                     '''
@@ -382,6 +396,8 @@ class GuideGuests(smach.State):#ゲストのガイド
             else:
                                     
                 #空いている椅子を指す
+
+                #RANGE外の座標にある椅子を除外し、一番左にある椅子に向きを変える
                 chair_points = self.multiple("chair").points
                 if chair_points:
                     i = 0
@@ -392,6 +408,8 @@ class GuideGuests(smach.State):#ゲストのガイド
                         else:
                             i += 1
                     angle = math.atan2(chair_y,chair_x) * (180/ math.pi)
+
+                #RANGE外の座標にある人を除外
                 person_points = self.multiple("person").points
                 if person_points:
                     i = 0
@@ -403,8 +421,9 @@ class GuideGuests(smach.State):#ゲストのガイド
                             i += 1
                     person_angle = math.atan2(person_y,person_x) * (180/ math.pi)
                 print('person_angle:'+ str(person_angle) + 'angle:'+str(angle)) 
+
+                #人と椅子の方向がかぶっているとき右の椅子を参照する
                 if (person_angle + 3 > angle) and (person_angle - 3 < angle):
-                
                     while (1):
                         chair_x,chair_y = self.guide.Calculate_Angle(chair_points,i+1)
                         if (chair_x < RANGE)and(chair_y < RANGE):
